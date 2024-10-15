@@ -9,11 +9,11 @@ const PLAYER_1 = 'red'
 const PLAYER_2 = 'yellow'
 
 export default function ConnectFour() {
-  const [board, setBoard] = useState(Array(ROWS).fill().map(() => Array(COLS).fill(EMPTY)))
+  const [board, setBoard] = useState<Array<Array<string | null>>>(Array(ROWS).fill(null).map(() => Array(COLS).fill(EMPTY)));
   const [currentPlayer, setCurrentPlayer] = useState(PLAYER_1)
-  const [winner, setWinner] = useState(null)
+  const [winner, setWinner] = useState<string | null>(null);
 
-  const checkWinner = useCallback((board, row, col, player) => {
+  const checkWinner = useCallback((board: Array<Array<string | null>>, row: number, col: number, player: string) => {
     // Check horizontal
     for (let c = 0; c <= COLS - 4; c++) {
       if (board[row][c] === player &&
@@ -61,29 +61,30 @@ export default function ConnectFour() {
     return false
   }, [])
 
-  const dropPiece = useCallback((col) => {
-    if (winner) return
+  const dropPiece = useCallback((col: number) => {
+    if (winner) return;
 
-    const newBoard = board.map(row => [...row])
+    const newBoard = board.map(row => [...row]);
     for (let row = ROWS - 1; row >= 0; row--) {
-      if (newBoard[row][col] === EMPTY) {
-        newBoard[row][col] = currentPlayer
-        if (checkWinner(newBoard, row, col, currentPlayer)) {
-          setWinner(currentPlayer)
-        } else {
-          setCurrentPlayer(currentPlayer === PLAYER_1 ? PLAYER_2 : PLAYER_1)
+        if (newBoard[row][col] === EMPTY) {
+            newBoard[row][col] = currentPlayer;
+            if (checkWinner(newBoard, row, col, currentPlayer)) {
+                setWinner(currentPlayer);
+            } else {
+                setCurrentPlayer(currentPlayer === PLAYER_1 ? PLAYER_2 : PLAYER_1);
+            }
+            setBoard(newBoard);
+            break;
         }
-        setBoard(newBoard)
-        break
-      }
     }
-  }, [board, currentPlayer, winner, checkWinner])
+}, [board, currentPlayer, winner, checkWinner]);
 
-  const resetGame = useCallback(() => {
-    setBoard(Array(ROWS).fill().map(() => Array(COLS).fill(EMPTY)))
-    setCurrentPlayer(PLAYER_1)
-    setWinner(null)
-  }, [])
+
+    const resetGame = useCallback(() => {
+        setBoard(Array(ROWS).fill(null).map(() => Array(COLS).fill(EMPTY)));
+        setCurrentPlayer(PLAYER_1);
+        setWinner(null);
+    }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
